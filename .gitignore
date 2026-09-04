@@ -1,0 +1,24 @@
+# ---- 模型权重（不上传，太大）----
+# 基础模型 6.5GB（Qwen2.5-VL-7B-Instruct bnb-4bit）
+Qwen2.5-VL-7B-Instruct-bnb-4bit/
+
+# LoRA 微调权重 / 合并后模型
+代码/lora_model_bills/
+代码/lora_model_bills_merged/
+
+# ---- 训练/评估生成物 ----
+代码/*.log
+代码/eval_metrics.json
+代码/trainer_output/
+代码/unsloth_compiled_cache/
+
+# ---- Python ----
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# ---- 系统/编辑器 ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
