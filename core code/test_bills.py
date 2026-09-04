@@ -6,7 +6,7 @@
 2. 字段级校验：日期/金额/凭证字号/流水号/借贷平衡（正则提取对比，抓数字幻觉）
 3. 异常检测：输出是否提到异常关键词，与真实 label 对比（分类准确率/精确率/召回率）
 
-用法：cd 代码 && python test_bills.py
+用法：cd "core code" && python test_bills.py
 """
 import os
 import re

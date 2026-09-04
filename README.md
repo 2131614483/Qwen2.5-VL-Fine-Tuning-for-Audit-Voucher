@@ -7,15 +7,16 @@
 ## 📦 目录结构
 
 ```
-QWEN2.5-VL-审计凭证微调-验收/
-├── README.md                          ← 本文件（验收入口）
-├── Qwen2.5-VL-7B-Instruct-bnb-4bit/   ← 4-bit 基座模型（6.9GB，全量）
-├── 代码/
+QWEN2.5-VL-审计凭证微调/
+├── README.md                          ← 本文件（入口）
+├── download_model.py                  ← 基座模型下载脚本（ModelScope 4-bit 版）
+├── Qwen2.5-VL-7B-Instruct-bnb-4bit/   ← 4-bit 基座模型（6.9GB，全量，不入库）
+├── core code/                         ← 训练/评估/报告 核心脚本
 │   ├── train_bills.py                 ← 独立微调训练脚本
 │   ├── test_bills.py                  ← 评估：一致率 + 字段校验 + 异常检测
 │   ├── check_rules.py                 ← 规则引擎（判定异常，纯函数库）
 │   ├── gen_report.py                  ← 实验报告生成器
-│   ├── lora_model_bills/              ← 已训练好的 LoRA 适配器（165MB，可直接评估）
+│   ├── lora_model_bills/              ← 已训练好的 LoRA 适配器（可直接评估，不入库）
 │   ├── lora_model_bills_merged/       ← 合并版（注：仅配置，权重需在目标机合并）
 │   ├── eval_metrics.json              ← 最近一次评估指标（test_bills 输出）
 │   └── train_bills_run*.log           ← 历史训练日志（gen_report 输入）
@@ -25,10 +26,8 @@ QWEN2.5-VL-审计凭证微调-验收/
 │   ├── _preview/                      # 各类样式预览图
 │   ├── gen/                           # 合成生成器（可重新生成）
 │   └── README.md                      # 数据说明
-├── 实验报告/                          # v1-v4 训练复盘 + 实验详情
-├── 审计票据凭证识别方案.md             # 早期方案
-├── 微调实战教程.md                     # 原理 + 操作教程（VLM/LoRA/SFT）
-└── RTX5060Ti环境配置方案.md            # 16GB 环境搭建指南
+├── docs/                              ← 文档：学习笔记 / 环境配置方案 / 审计方案
+└── report/                            ← v1-v4 训练复盘 + 实验详情
 ```
 
 ---
@@ -40,22 +39,22 @@ QWEN2.5-VL-审计凭证微调-验收/
 conda activate rtx5060tixunlian        # 或你自建的等价环境
 
 # 1. 评估已训练模型（加载 lora_model_bills → 验证集推理 → 规则判定）
-cd 代码
+cd "core code"
 python test_bills.py
 ```
 
 期望结果（已实测通过）：
 - **规则判定异常：准确率 100% / 精确率 100% / 召回率 100%**（TP9 FP0 FN0 TN9）
 - 模型文本自判异常：准确率 83.3% / 精确率 100% / 召回率 66.7%
-- 输出写入 `代码/eval_metrics.json`
+- 输出写入 `core code/eval_metrics.json`
 
 ---
 
 ## 🔧 重新训练
 
 ```bash
-cd 代码
-python train_bills.py      # 完整训练约 30-40 分钟，输出 代码/lora_model_bills/
+cd "core code"
+python train_bills.py      # 完整训练约 30-40 分钟，输出 core code/lora_model_bills/
 ```
 
 训练关键点（脚本内已配置）：
@@ -91,4 +90,5 @@ python train_bills.py      # 完整训练约 30-40 分钟，输出 代码/lora_m
 ## ⚠️ 已知说明
 
 - `lora_model_bills_merged/` 当前仅含配置（tokenizer/config），**不含 model.safetensors**：unsloth 在 Windows 上合并 4-bit 权重写盘存在兼容问题。如需合并模型，请在 Linux / AutoDL 上重跑 `save_pretrained_merged(..., save_method="forced_merged_4bit")`，或用 `lora_model_bills/`（LoRA 适配器，加载即用，本包评估即走此路）。
-- 基座模型来自 ModelScope `unsloth/Qwen2.5-VL-7B-Instruct-bnb-4bit`，已下载入本包，无需联网。
+- 基座模型（`Qwen2.5-VL-7B-Instruct-bnb-4bit/`）**不随仓库提交**，需先运行根目录 `download_model.py` 从 ModelScope 下载（4-bit 量化版，≈6.9GB），或用 `docs/RTX5060Ti环境配置方案.md` 里的 `snapshot_download` 命令。
+- LoRA 适配器（`core code/lora_model_bills/`）体积小且已训练好，可在克隆后直接评估，无需联网。

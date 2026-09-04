@@ -1,7 +1,7 @@
 # Qwen2.5-VL 审计凭证识别微调学习笔记
 
 > 适用场景：用你自己的 RTX 5060 Ti（16GB）微调视觉语言模型，让 AI 自动识别记账凭证、银行回单、差旅报销单等审计票据，并发现不合规异常。
-> 本文从"模型怎么工作"讲到"怎么训练、怎么评估"，配合本项目 `data_bills/` 和 `代码/train_bills.py` 一起看。
+> 本文从"模型怎么工作"讲到"怎么训练、怎么评估"，配合本项目 `data_bills/` 和 `core code/train_bills.py` 一起看。
 
 ---
 
@@ -122,8 +122,8 @@ messages = [
 ## 7. 数据格式与图片路径约定
 
 - JSONL 里 `image` 是**相对路径**，基准是数据集目录（`data_bills/`），所以写 `images/xxx.jpg`
-- `train_bills.py` 里 `DATA_DIR = "../data_bills"`，加载时 `os.path.join(DATA_DIR, sample["image"])`
-- 训练脚本必须**从 `代码/` 目录运行**，因为 `../data_bills` 是相对 `代码/` 的
+- `train_bills.py` 用脚本自身位置锚定项目根（`_BASE`），`DATA_DIR = os.path.join(_BASE, "data_bills")`，加载时 `os.path.join(DATA_DIR, sample["image"])`
+- 脚本不依赖运行时 cwd，从仓库任意目录运行均可；文档示例统一 `cd "core code"` 运行只是便于就近看文件
 
 ## 8. 图像分辨率（max_pixels）的权衡
 
@@ -227,7 +227,7 @@ print(Counter(r[\"category\"] for r in rows)); print(Counter(r[\"label\"] for r 
 再用 `data_bills/_preview/` 里的预览图，或直接打开 `images/` 里的图，肉眼核对"图 ↔ caption"是否一致。
 ## 3. 训练
 
-### 3.1 训练脚本 `代码/train_bills.py` 逐段讲解
+### 3.1 训练脚本 `core code/train_bills.py` 逐段讲解
 
 （1）**加载 4-bit 基座模型** —— 读入 Qwen2.5-VL-7B 的 4-bit 量化版，省显存：
 
@@ -304,11 +304,11 @@ tokenizer.save_pretrained("lora_model_bills")
 ### 3.2 怎么运行
 
 ```bash
-cd 代码
+cd "core code"
 python train_bills.py
 ```
 
-必须从 `代码/` 目录运行（`DATA_DIR = "../data_bills"` 是相对 `代码/` 的）。
+（脚本以自身位置锚定路径，不依赖 cwd；`cd` 仅为就近查看输出。）
 
 ### 3.3 训练时看什么
 
@@ -329,12 +329,12 @@ python train_bills.py
 | **只记得训练集** | 降低 epoch（3→2），或加一点验证集早停 |
 ## 4. 推理测试
 
-### 4.1 推理脚本 `代码/test_bills.py`
+### 4.1 推理脚本 `core code/test_bills.py`
 
 加载训练好的 LoRA 适配器 + 基座模型，对 `val.jsonl` 每类抽几张跑一遍，**逐条打印"参考描述 vs 模型输出"**：
 
 ```bash
-cd 代码
+cd "core code"
 python test_bills.py
 ```
 

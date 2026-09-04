@@ -27,7 +27,7 @@ from transformers import TextStreamer
 _BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(_BASE, "data_bills")              # 验收目录内 data_bills
 MODEL_DIR = os.path.join(_BASE, "Qwen2.5-VL-7B-Instruct-bnb-4bit")  # 验收目录内基座模型
-SAVE_DIR = os.path.join(_BASE, "代码", "lora_model_bills")
+SAVE_DIR = os.path.join(_BASE, "core code", "lora_model_bills")
 os.makedirs(SAVE_DIR, exist_ok=True)
 
 # 票据文字密集：提升图片分辨率上限（memory 不够时降到 768*28*28）

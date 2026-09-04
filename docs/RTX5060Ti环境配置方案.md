@@ -137,13 +137,23 @@ pip install -r requirements_rtx5060ti.txt
 
 ## 4. 模型下载
 
+**推荐**：用项目根目录的下载脚本（等价于下面命令）：
+
 ```bash
-# 通过 ModelScope 下载 4-bit 量化版（≈4-5 GB, 推荐方案）
+cd 项目根
+python download_model.py     # 从 ModelScope 下载 unsloth/Qwen2.5-VL-7B-Instruct-bnb-4bit → models/
+```
+
+或手动 ModelScope 下载 4-bit 量化版（≈6.9GB）：
+
+```bash
 python -c "
 from modelscope import snapshot_download
 snapshot_download('unsloth/Qwen2.5-VL-7B-Instruct-bnb-4bit', local_dir='./models/Qwen2.5-VL-7B-Instruct-bnb-4bit')
 "
 ```
+
+> 训练/推理脚本默认从项目根 `Qwen2.5-VL-7B-Instruct-bnb-4bit/` 读基座模型；下载到 `models/` 后需把 `MODEL_DIR` 指向实际路径（或复制到根目录同名文件夹）。
 
 ---
 

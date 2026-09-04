@@ -3,16 +3,16 @@
 训练实验报告生成器
 =================
 每次训练跑完后，从训练日志 + 评估指标 + 数据统计，自动生成详细 markdown 实验报告。
-用法（在 代码/ 目录下运行）：
+用法（在 core code/ 目录下运行）：
     python gen_report.py --version v3 --train-log train_bills_run3.log --notes notes.md
-输出：实验报告/训练实验-{version}-{日期}.md
+输出：report/训练实验-{version}-{日期}.md
 """
 import argparse, json, os, re, datetime
 from collections import Counter
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(BASE, "data_bills")
-OUT_DIR = os.path.join(BASE, "实验报告")
+OUT_DIR = os.path.join(BASE, "report")
 os.makedirs(OUT_DIR, exist_ok=True)
 
 
